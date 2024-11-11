@@ -1,3 +1,6 @@
+/* Updated HomePage.css */
+
+/* 기본 스타일 */
 body {
   font-family: Arial, sans-serif;
   background-color: #f0f2f5;
@@ -60,24 +63,30 @@ select {
   box-sizing: border-box;
 }
 
+/* 요일 선택 스타일 */
 .checkbox-group {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  width: 100%;
 }
 
 .checkbox-item {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  gap: 5px;
+  padding: 8px 0;
 }
 
 .checkbox-item label {
   display: flex;
   align-items: center;
-  gap: 5px;
+  font-size: 15px;
+  color: #333;
 }
 
+/* 시간 선택 드롭다운 너비 조정 */
 .time-inputs {
   display: flex;
   flex-direction: row;
@@ -89,13 +98,20 @@ select {
 .time-input {
   display: flex;
   flex-direction: column;
-  width: 48%;
+  width: 100%; /* 각 선택 필드가 전체 너비를 차지하도록 수정 */
 }
 
 .time-input select {
   margin-top: 5px;
+  width: 80%; /* 드롭다운이 전체 너비를 차지하도록 수정 */
 }
 
+.time-input label {
+  font-size: 14px;
+  color: #555;
+}
+
+/* 버튼 스타일 */
 .submit-button {
   padding: 10px;
   background-color: #61dafb;
@@ -113,6 +129,7 @@ select {
   background-color: #21a1f1;
 }
 
+/* 요약 컨테이너 스타일 */
 .summary-container {
   margin-top: 20px;
   padding: 20px;
