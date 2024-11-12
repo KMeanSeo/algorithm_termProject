@@ -136,8 +136,13 @@ function App() {
         {/* PriorityPage route for selecting exercises by body part */}
         <Route
           path="/priority"
-          element={<PriorityPage csvFilePath="updated_exercise_data.csv" />}
+          element={
+            <PriorityPage
+              csvFilePath={`${process.env.PUBLIC_URL}/updated_exercise_data.csv`}
+            />
+          }
         />
+
         {/* OptimizedExercisePage route for viewing optimized exercise schedule */}
         <Route
           path="/optimized-exercises"
