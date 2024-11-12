@@ -7,16 +7,15 @@ import {
   buildWeeklyPlans,
   planNextWeek,
   findDailyExerciseCombination,
-  calculateWeeklyPenalty,
 } from "../function/exerciseAlgorithm";
 
-function OptimizedExercisePage() {
+// OptimizedExercisePage component for displaying optimized exercise schedule
+function OptimizedExercisePage({ currentWeight }) {
   const location = useLocation();
   const {
     allExercises,
     selectedDays,
     dailyTimes,
-    currentWeight,
     targetWeight,
     weeklyCalorieDeficit,
     totalCaloriesToBurn,
@@ -30,16 +29,18 @@ function OptimizedExercisePage() {
     totalCaloriesToBurn: 0,
   };
 
+  // Converts selectedDays and dailyTimes to schedules with start and end times in hours
   const schedules = selectedDays.map((day) => ({
     day,
     startTime: parseInt(dailyTimes[day].start.split(":")[0], 10),
     endTime: parseInt(dailyTimes[day].end.split(":")[0], 10),
   }));
 
+  // Builds a weekly plan over 4 weeks based on the exercises, schedules, and current weight
   const weeklyPlan =
     buildWeeklyPlans(4, allExercises, schedules, currentWeight) || [];
 
-  // 첫 번째 주의 총 칼로리 소모량 계산
+  // Calculates total calories burned in the first week
   const firstWeekCaloriesBurned =
     weeklyPlan.length > 0
       ? Object.values(weeklyPlan[0].dailyExercises)
@@ -52,7 +53,7 @@ function OptimizedExercisePage() {
           }, 0)
       : 0;
 
-  // 전체 주차의 총 칼로리 소모량 계산
+  // Calculates total calories burned over all weeks
   const totalWeeklyCaloriesBurned = weeklyPlan.reduce((total, weekPlan) => {
     const weeklyCalories = Object.values(weekPlan.dailyExercises)
       .flat()
@@ -65,7 +66,7 @@ function OptimizedExercisePage() {
     return total + weeklyCalories;
   }, 0);
 
-  // 목표 칼로리 소모량 대비 달성률 계산
+  // Calculate percentages of the goal achieved
   const firstWeekPercentageAchieved =
     (firstWeekCaloriesBurned / totalCaloriesToBurn) * 100;
   const totalPercentageAchieved =
@@ -74,21 +75,22 @@ function OptimizedExercisePage() {
   return (
     <div className="App">
       <header className="App-header">
-        <h2>최적화된 운동 시간표</h2>
+        <h2>Optimized Exercise Schedule</h2>
         {weeklyPlan.length > 0 && (
-          <div>
+          <div className="weekly-plan">
             {Object.keys(weeklyPlan[0].dailyExercises).map((day) => {
-              // 요일별 총 운동 시간과 칼로리 소모량 계산
               const dailyExercises = weeklyPlan[0].dailyExercises[day];
-              let totalDailyTime = dailyExercises.reduce(
-                (sum, exercise) => sum + exercise.time,
+
+              // Calculate total time for the day's exercises, including rest times
+              const totalDailyTime = dailyExercises.reduce(
+                (sum, exercise, index) =>
+                  sum +
+                  exercise.time +
+                  (index < dailyExercises.length - 1 ? 2 : 0),
                 0
               );
 
-              // 휴식 시간 추가 (각 운동 사이에 3분)
-              const totalRestTime = (dailyExercises.length - 1) * 3;
-              totalDailyTime += totalRestTime; // 총 운동 시간에 휴식 시간 포함
-
+              // Calculate total calories burned for the day
               const totalDailyCalories = dailyExercises.reduce(
                 (sum, exercise) => {
                   const exerciseTimeHours = exercise.time / 60.0;
@@ -98,28 +100,42 @@ function OptimizedExercisePage() {
               );
 
               return (
-                <div key={day}>
+                <div key={day} className="day-schedule">
                   <h3>
-                    {day} - 총 운동 시간: {Math.floor(totalDailyTime / 60)}시간{" "}
-                    {totalDailyTime % 60}분 (휴식 포함), 칼로리 소모량:{" "}
-                    {totalDailyCalories.toFixed(2)} kcal
+                    <span className="day-name">{day}</span> - Total Exercise
+                    Time: {Math.floor(totalDailyTime / 60)} hrs{" "}
+                    {totalDailyTime % 60} mins (including rest), Calories
+                    Burned:{" "}
+                    <strong>{totalDailyCalories.toFixed(2)} kcal</strong>
                   </h3>
                   <ul className="exercise-list">
-                    {dailyExercises.map((exercise, idx) => (
-                      <li key={exercise.name} className="exercise-item">
-                        <strong>순서 {idx + 1}:</strong> {exercise.name}
-                        <br />
-                        <span className="exercise-details">
-                          부위: {exercise.bodyPart}, MET:{" "}
-                          {exercise.met.toFixed(1)}, 시간: {exercise.time}분,
-                          피로도 효과:{" "}
-                          {exercise.fatigueEffectiveness.toFixed(1)}
-                        </span>
-                        {idx < dailyExercises.length - 1 && (
-                          <div className="rest-time">쉬는 시간: 3분</div>
-                        )}
-                      </li>
-                    ))}
+                    {dailyExercises.map((exercise, idx) => {
+                      const exerciseTimeHours = exercise.time / 60.0;
+                      const caloriesBurnedForExercise =
+                        exercise.met * currentWeight * exerciseTimeHours;
+
+                      return (
+                        <li key={exercise.name} className="exercise-item">
+                          <strong>Order {idx + 1}:</strong> {exercise.name} -{" "}
+                          <span className="exercise-calories">
+                            Calories Burned:{" "}
+                            {caloriesBurnedForExercise.toFixed(2)} kcal
+                          </span>
+                          <br />
+                          <span className="exercise-details">
+                            Target Area: {exercise.bodyPart}, MET:{" "}
+                            {exercise.met.toFixed(1)}, Duration: {exercise.time}{" "}
+                            mins, Fatigue Effectiveness:{" "}
+                            {exercise.fatigueEffectiveness.toFixed(1)}
+                          </span>
+                          {idx < dailyExercises.length - 1 && (
+                            <div className="rest-time">
+                              Rest Time: <strong>2 mins</strong>
+                            </div>
+                          )}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               );
@@ -127,20 +143,22 @@ function OptimizedExercisePage() {
           </div>
         )}
         <div className="summary">
-          <h3>운동 계획 요약</h3>
-          <p>총 주차: {weeklyPlan.length}주</p>
+          <h3>Exercise Plan Summary</h3>
           <p>
-            주당 칼로리 소모 목표: {firstWeekCaloriesBurned.toFixed(2)} kcal
+            Weekly Calorie Deficit Goal:{" "}
+            <strong>{firstWeekCaloriesBurned.toFixed(2)} kcal</strong>
           </p>
           <p>
-            총 소모한 전체 칼로리: {totalWeeklyCaloriesBurned.toFixed(2)} kcal
+            Total Achievement Rate:{" "}
+            <strong>
+              {totalPercentageAchieved.toFixed(2)}% (
+              {totalWeeklyCaloriesBurned.toFixed(2)}/
+              {totalCaloriesToBurn.toFixed(2)}) kcal
+            </strong>
           </p>
-          <p>목표 칼로리 소모량: {totalCaloriesToBurn.toFixed(2)} kcal</p>
-          <p>주당 달성률: {firstWeekPercentageAchieved.toFixed(2)}%</p>
-          <p>전체 달성률: {totalPercentageAchieved.toFixed(2)}%</p>
         </div>
         <Link to="/" className="back-button">
-          돌아가기
+          Go Back
         </Link>
       </header>
     </div>

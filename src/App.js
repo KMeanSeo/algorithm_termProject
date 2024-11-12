@@ -7,6 +7,7 @@ import OptimizedExercisePage from "./screen/OptimizedExercisePage";
 import HomePage from "./screen/HomePage";
 
 function App() {
+  // State for user input on current weight, target weight, duration, and exercise schedule
   const [currentWeight, setCurrentWeight] = useState("");
   const [targetWeight, setTargetWeight] = useState("");
   const [months, setMonths] = useState(1);
@@ -22,6 +23,7 @@ function App() {
   });
   const [summary, setSummary] = useState(null);
 
+  // Handle change for selected days with checkboxes
   const handleCheckboxChange = (day) => {
     setSelectedDays((prevDays) =>
       prevDays.includes(day)
@@ -30,6 +32,7 @@ function App() {
     );
   };
 
+  // Handle time change for exercise start and end times
   const handleTimeChange = (day, field, value) => {
     setDailyTimes({
       ...dailyTimes,
@@ -37,35 +40,36 @@ function App() {
     });
   };
 
-  const calculateSummary = (navigate) => {
+  // Calculate the exercise summary based on user input
+  const calculateSummary = () => {
     if (!currentWeight) {
-      alert("현재 체중을 입력하세요.");
+      alert("Please enter your current weight.");
       return;
     }
 
     if (!targetWeight) {
-      alert("목표 체중을 입력하세요.");
+      alert("Please enter your target weight.");
       return;
     }
 
     if (parseFloat(targetWeight) >= parseFloat(currentWeight)) {
-      alert("목표 체중은 현재 체중보다 낮아야 합니다.");
+      alert("Target weight should be less than current weight.");
       return;
     }
 
     if (selectedDays.length === 0) {
-      alert("최소한 하나의 운동 요일을 선택해야 합니다.");
+      alert("Please select at least one exercise day.");
       return;
     }
 
     for (const day of selectedDays) {
       const { start, end } = dailyTimes[day];
       if (!start || !end) {
-        alert(`${day}의 시작 시간과 종료 시간을 모두 설정해야 합니다.`);
+        alert(`Please set both start and end times for ${day}.`);
         return;
       }
       if (start >= end) {
-        alert(`${day}의 시작 시간은 종료 시간보다 이전이어야 합니다.`);
+        alert(`Start time for ${day} should be earlier than end time.`);
         return;
       }
     }
@@ -78,6 +82,7 @@ function App() {
       2
     );
 
+    // Calculate total exercise time in minutes for selected days
     const totalExerciseTime = selectedDays.reduce((total, day) => {
       const { start, end } = dailyTimes[day];
       if (start && end) {
@@ -90,6 +95,7 @@ function App() {
       return total;
     }, 0);
 
+    // Set the calculated summary data
     setSummary({
       currentWeight,
       targetWeight,
@@ -99,23 +105,12 @@ function App() {
       dailyTimes,
       totalExerciseTime,
     });
-
-    navigate("/priority", {
-      state: {
-        currentWeight,
-        targetWeight,
-        months,
-        selectedDays,
-        dailyTimes,
-        weeklyCalorieDeficit,
-        totalCaloriesToBurn: totalWeightLoss * caloriesPerKg,
-      },
-    });
   };
 
   return (
     <Router>
       <Routes>
+        {/* HomePage route for setting exercise goals */}
         <Route
           path="/"
           element={
@@ -138,13 +133,15 @@ function App() {
             />
           }
         />
+        {/* PriorityPage route for selecting exercises by body part */}
         <Route
           path="/priority"
           element={<PriorityPage csvFilePath="updated_exercise_data.csv" />}
         />
+        {/* OptimizedExercisePage route for viewing optimized exercise schedule */}
         <Route
           path="/optimized-exercises"
-          element={<OptimizedExercisePage />}
+          element={<OptimizedExercisePage currentWeight={currentWeight} />}
         />
       </Routes>
     </Router>

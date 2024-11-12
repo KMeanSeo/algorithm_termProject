@@ -1,8 +1,9 @@
 // HomePage.js
 import React from "react";
-
+import "./HomePage.css";
 import { useNavigate } from "react-router-dom";
 
+// HomePage component for setting exercise goals
 function HomePage({
   currentWeight,
   setCurrentWeight,
@@ -22,6 +23,7 @@ function HomePage({
 }) {
   const navigate = useNavigate();
 
+  // Handles calculation of summary and navigation to the next page
   const handleCalculateSummary = () => {
     calculateSummary(navigate);
   };
@@ -29,41 +31,48 @@ function HomePage({
   return (
     <div className="App">
       <header className="App-header">
-        <h2>운동 목표 설정</h2>
+        <h2>Set Exercise Goals</h2>
         <div className="form-container">
+          {/* Current weight input */}
           <div className="form-group">
-            <label>현재 체중 (kg)</label>
+            <label>Current Weight (kg)</label>
             <input
               type="number"
               value={currentWeight}
               onChange={(e) => setCurrentWeight(e.target.value)}
-              placeholder="예: 70"
+              placeholder="e.g., 70"
             />
           </div>
+
+          {/* Target weight input */}
           <div className="form-group">
-            <label>목표 체중 (kg)</label>
+            <label>Target Weight (kg)</label>
             <input
               type="number"
               value={targetWeight}
               onChange={(e) => setTargetWeight(e.target.value)}
-              placeholder="예: 65"
+              placeholder="e.g., 65"
             />
           </div>
+
+          {/* Select months for exercise duration */}
           <div className="form-group">
-            <label>운동 개월 수</label>
+            <label>Exercise Duration (months)</label>
             <select
               value={months}
               onChange={(e) => setMonths(parseInt(e.target.value))}
             >
               {[1, 2, 3, 4, 5, 6].map((month) => (
                 <option key={month} value={month}>
-                  {month}개월
+                  {month} month(s)
                 </option>
               ))}
             </select>
           </div>
+
+          {/* Select days of the week for exercise */}
           <div className="form-group">
-            <label>운동 요일 선택</label>
+            <label>Select Exercise Days</label>
             <div className="checkbox-group">
               {[
                 "Monday",
@@ -84,18 +93,19 @@ function HomePage({
                     />
                     {day}
                   </label>
+                  {/* Time input for each selected day */}
                   {selectedDays.includes(day) && (
                     <div className="time-inputs">
                       <div className="time-input">
-                        <label>시작 시간</label>
+                        <label>Start Time</label>
                         <select
                           value={dailyTimes[day].start}
                           onChange={(e) =>
                             handleTimeChange(day, "start", e.target.value)
                           }
                         >
-                          <option value="">선택</option>
-                          {Array.from({ length: 24 * 2 }, (_, i) => i * 30).map(
+                          <option value="">Select</option>
+                          {Array.from({ length: 24 * 1 }, (_, i) => i * 60).map(
                             (time) => {
                               const hours = Math.floor(time / 60);
                               const minutes = time % 60;
@@ -114,15 +124,15 @@ function HomePage({
                         </select>
                       </div>
                       <div className="time-input">
-                        <label>종료 시간</label>
+                        <label>End Time</label>
                         <select
                           value={dailyTimes[day].end}
                           onChange={(e) =>
                             handleTimeChange(day, "end", e.target.value)
                           }
                         >
-                          <option value="">선택</option>
-                          {Array.from({ length: 24 * 2 }, (_, i) => i * 30).map(
+                          <option value="">Select</option>
+                          {Array.from({ length: 24 * 1 }, (_, i) => i * 60).map(
                             (time) => {
                               const hours = Math.floor(time / 60);
                               const minutes = time % 60;
@@ -146,32 +156,35 @@ function HomePage({
               ))}
             </div>
           </div>
+
+          {/* Button to calculate summary */}
           <button className="submit-button" onClick={handleCalculateSummary}>
-            작성 완료
+            Complete
           </button>
         </div>
 
+        {/* Summary display */}
         {summary && (
           <div className="summary-container">
-            <h3>목표 요약</h3>
+            <h3>Goal Summary</h3>
             <p>
-              <strong>현재 체중:</strong> {summary.currentWeight} kg
+              <strong>Current Weight:</strong> {summary.currentWeight} kg
             </p>
             <p>
-              <strong>목표 체중:</strong> {summary.targetWeight} kg
+              <strong>Target Weight:</strong> {summary.targetWeight} kg
             </p>
             <p>
-              <strong>운동 개월:</strong> {summary.months}개월
+              <strong>Duration:</strong> {summary.months} month(s)
             </p>
             <p>
-              <strong>운동 요일:</strong> {summary.selectedDays}
+              <strong>Exercise Days:</strong> {summary.selectedDays}
             </p>
             <p>
-              <strong>주당 칼로리 소모 목표:</strong>{" "}
-              {summary.weeklyCalorieDeficit} 칼로리
+              <strong>Weekly Calorie Deficit Goal:</strong>{" "}
+              {summary.weeklyCalorieDeficit} calories
             </p>
             <p>
-              <strong>운동 시간:</strong>
+              <strong>Exercise Time:</strong>
             </p>
             <ul>
               {selectedDays.map((day) => (
@@ -182,10 +195,12 @@ function HomePage({
               ))}
             </ul>
             <p>
-              <strong>1주일에 총 운동 시간:</strong>{" "}
-              {Math.floor(summary.totalExerciseTime / 60)}시간{" "}
-              {summary.totalExerciseTime % 60}분
+              <strong>Total Exercise Time per Week:</strong>{" "}
+              {Math.floor(summary.totalExerciseTime / 60)} hours{" "}
+              {summary.totalExerciseTime % 60} minutes
             </p>
+
+            {/* Button to navigate to priority setting page */}
             <button
               onClick={() =>
                 navigate("/priority", {
@@ -196,13 +211,13 @@ function HomePage({
                     selectedDays,
                     dailyTimes,
                     weeklyCalorieDeficit: summary.weeklyCalorieDeficit,
-                    totalCaloriesToBurn: summary.totalExerciseTime * 7700,
+                    totalCaloriesToBurn: (currentWeight - targetWeight) * 7700,
                   },
                 })
               }
               className="priority-button"
             >
-              운동 우선순위 확인하기
+              Check Exercise Priority
             </button>
           </div>
         )}
