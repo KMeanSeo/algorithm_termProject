@@ -1,70 +1,97 @@
-# Getting Started with Create React App
+# Summary of Key Algorithms
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This document provides a concise summary of the key algorithms used in the provided JavaScript code for managing exercise data and generating weekly exercise plans.
 
-## Available Scripts
+## 1. `Exercise` Class
 
-In the project directory, you can run:
+### Key Algorithm: `calculateFatigueEffectiveness`
 
-### `npm start`
+- **Purpose**: Calculates fatigue effectiveness based on strength and MET values.
+- **Process**:
+  - Uses a lookup table to map strength levels to numerical weights.
+  - Multiplies the strength weight by the MET value.
+- **Output**: Returns the calculated fatigue effectiveness as a numerical value.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 2. `loadExercises(csvData)` Function
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Key Algorithm: CSV Parsing
 
-### `npm test`
+- **Purpose**: Loads exercises from CSV data and creates an array of `Exercise` objects.
+- **Process**:
+  - Parses CSV data using the `Papa.parse` library.
+  - Iterates over each row to create `Exercise` objects if required fields are present.
+- **Output**: Returns an array of `Exercise` objects.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 3. `groupExercisesByBodyPart(exercises)` Function
 
-### `npm run build`
+### Key Algorithm: Grouping and Sorting
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **Purpose**: Groups exercises by body part and sorts them based on fatigue effectiveness.
+- **Process**:
+  - Groups exercises by body part.
+  - Sorts each group by fatigue effectiveness in descending order.
+- **Output**: Returns an object with body parts as keys and sorted exercise arrays as values.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## 4. `buildWeeklyPlans(totalWeeks, allExercises, schedules, currentWeight)` Function
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Key Algorithm: Weekly Plan Generation
 
-### `npm run eject`
+- **Purpose**: Builds weekly plans for a specified number of weeks.
+- **Process**:
+  - Iterates over each week and calls `planNextWeek` to generate the plan.
+- **Output**: Returns an array of `WeeklyPlan` instances for each week.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 5. `planNextWeek(weekNumber, allExercises, schedules, currentWeight)` Function
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Key Algorithm: Daily Exercise Planning
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- **Purpose**: Plans exercises for the next week.
+- **Process**:
+  - Tracks used exercises to avoid repetition.
+  - Calls `findDailyExerciseCombination` and `fillRemainingTime` to select and utilize exercises.
+- **Output**: Returns a `WeeklyPlan` instance with planned exercises.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 6. `findDailyExerciseCombination(exercises, availableTime, currentWeight, usedExercisesThisWeek)` Function
 
-## Learn More
+### Key Algorithm: Greedy Selection
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- **Purpose**: Finds a combination of exercises for a day within available time.
+- **Process**:
+  - Sorts exercises by MET value in descending order.
+  - Selects exercises that fit within the available time and avoids repetition.
+- **Output**: Returns an array of selected exercises.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## 7. `fillRemainingTime(selectedExercises, allExercises, availableTime, usedExercisesThisWeek)` Function
 
-### Code Splitting
+### Key Algorithm: Approximate Solution for NP-hard Problem
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- **Purpose**: Fills remaining time with additional exercises.
+- **Process**:
+  - Uses an approximate method to add exercises without exhaustive computation.
+  - Ensures balanced body part usage.
+- **Output**: Returns an updated array of selected exercises.
 
-### Analyzing the Bundle Size
+## 8. `balanceBodyParts(selectedExercises, bodyPartUsage)` Function
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Key Algorithm: Local Optimization
 
-### Making a Progressive Web App
+- **Purpose**: Balances the usage of body parts in selected exercises.
+- **Process**:
+  - Adjusts the exercise sequence to prevent overworking any body part.
+- **Output**: Returns an adjusted array of exercises with balanced body part usage.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Key Concepts
 
-### Advanced Configuration
+- **Lookup Table**: Used for mapping strength levels to numerical weights.
+- **Greedy Algorithm**: Prioritizes exercises with the highest MET values.
+- **Approximate Solutions**: Provides practical solutions to NP-hard problems.
+- **Local Optimization**: Ensures balanced exercise distribution across body parts.
+- **Time Constraints**: Limits execution time to prevent performance issues.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Considerations
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Avoids repetition of exercises within the same week.
+- Balances workload across different body parts.
+- Manages total exercise time to fit within available daily schedules.
+- Adds fixed rest times between exercises.
+- Ensures efficient execution by avoiding long-running loops.
