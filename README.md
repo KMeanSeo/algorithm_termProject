@@ -2,6 +2,12 @@
 
 This document provides a summary of the key algorithms used in the provided JavaScript code for managing exercise data and generating weekly exercise plans.
 
+## How to use open sources
+Can check on the following website.
+[Website Link](https://kmeanseo.github.io/algorithm_termProject/)
+
+
+
 ## Key Algorithms
 
 ### 1. Lookup Table
